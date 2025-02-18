@@ -2,6 +2,7 @@ package gobinarytree
 
 import "fmt"
 
+//Структура
 type Node struct {
 	X      int
 	Left   *Node
@@ -9,12 +10,14 @@ type Node struct {
 	Parent *Node
 }
 
+//Создание дерева (корня)
 func NewBinaryTree(x int) *Node {
 	return &Node{X: x}
 }
 
+//Создание узла
 func (n *Node) CreateNode(x int) {
-	if n == nil {
+	if n == nil || n.IsExist(x) {
 		return
 	}
 
@@ -33,10 +36,11 @@ func (n *Node) CreateNode(x int) {
 	}
 
 	if !n.IsBalanced() {
-		n = n.BalanceTree()
+		*n = *n.BalanceTree()
 	}
 }
 
+//Вывод дерева на экран
 func (n *Node) PrintTree() {
 	if n == nil {
 		return
@@ -46,10 +50,12 @@ func (n *Node) PrintTree() {
 	n.Right.PrintTree()
 }
 
+//Преобразование дерева в массив
 func (n *Node) TreeInArray() []int {
 	return n.treeArrayRecursion()
 }
 
+//вспомогательная функция
 func (n *Node) treeArrayRecursion() []int {
 	if n == nil {
 		return []int{}
@@ -61,6 +67,7 @@ func (n *Node) treeArrayRecursion() []int {
 	return arr
 }
 
+//Преобразование отсортированного массива в дерево
 func SortedArrayInTree(arr []int) *Node {
 	if len(arr) == 0 {
 		return nil
@@ -82,6 +89,7 @@ func SortedArrayInTree(arr []int) *Node {
 	return NewTree
 }
 
+//Преобразование массива в дерево
 func ArrayInTree(arr []int) *Node {
 	if len(arr) == 0 {
 		return nil
@@ -98,6 +106,7 @@ func ArrayInTree(arr []int) *Node {
 	return NewTree
 }
 
+//Поиск элемента
 func (n *Node) Find(x int) *Node {
 	if n == nil {
 		return nil
@@ -112,6 +121,7 @@ func (n *Node) Find(x int) *Node {
 	}
 }
 
+//Поиск минимального элемента
 func (n *Node) Min() *Node {
 	if n.Left == nil {
 		return n
@@ -119,6 +129,7 @@ func (n *Node) Min() *Node {
 	return n.Left.Min()
 }
 
+//Поиск максимального элемента
 func (n *Node) Max() *Node {
 	if n.Right == nil {
 		return n
@@ -126,12 +137,14 @@ func (n *Node) Max() *Node {
 	return n.Right.Max()
 }
 
+//Метод для балансировки дерева
 func (n *Node) BalanceTree() *Node {
 	buf_arr := n.TreeInArray()
 	NewTree := SortedArrayInTree(buf_arr)
 	return NewTree
 }
 
+//Удаление любого узла
 func (n *Node) Delete(x int) {
 	NodeToDelete := n.Find(x)
 	if NodeToDelete == nil {
@@ -223,10 +236,11 @@ func (n *Node) Delete(x int) {
 
 	//балансировка
 	if !n.IsBalanced() {
-		n = n.BalanceTree()
+		*n = *n.BalanceTree()
 	}
 }
 
+//Определение максимальной глубины дерева
 func (n *Node) Height() int {
 	if n == nil {
 		return -1
@@ -239,6 +253,7 @@ func (n *Node) Height() int {
 	return rightHeight + 1
 }
 
+//Подсчёт количества узлов
 func (n *Node) CountNodes() int {
 	if n == nil {
 		return 0
@@ -246,6 +261,7 @@ func (n *Node) CountNodes() int {
 	return n.Left.CountNodes() + n.Right.CountNodes() + 1
 }
 
+//Проверка на баланс дерева
 func (n *Node) IsBalanced() bool {
 	if n == nil {
 		return true
@@ -261,6 +277,7 @@ func (n *Node) IsBalanced() bool {
 	return n.Left.IsBalanced() && n.Right.IsBalanced()
 }
 
+//вспомогательная функция модуля
 func abs(x int) int {
 	if x < 0 {
 		return -x
@@ -269,19 +286,48 @@ func abs(x int) int {
 	}
 }
 
-func (n *Node) Clear() {
-	*n = Node{}
+//Проверка на существование корня
+func (n *Node) IsExist(x int) bool {
+	return n.Find(x) != nil
 }
 
-func main() {
-	MyBinaryTree := NewBinaryTree(1)
+//Проверка дерева на соответствие детей родителям
+func (n *Node) CheckTree() bool {
+	return n.checkTreeHelper(nil, nil)
+}
 
-	MyBinaryTree.CreateNode(2)
-	MyBinaryTree.CreateNode(3)
-	MyBinaryTree.CreateNode(4)
-	MyBinaryTree.CreateNode(5)
-	MyBinaryTree.CreateNode(5)
-	MyBinaryTree.CreateNode(5)
+//вспомогательная функция
+func (n *Node) checkTreeHelper(min, max *int) bool {
+	if n == nil {
+		return true
+	}
 
-	MyBinaryTree.PrintTree()
+	if (min != nil && n.X <= *min) || (max != nil && n.X >= *max) {
+		return false
+	}
+
+	return n.Left.checkTreeHelper(min, &n.X) && n.Right.checkTreeHelper(&n.X, max)
+}
+
+//Взятие следующего элемента у дерева
+func (n *Node) GetNext() *Node {
+	if n == nil {
+		return nil
+	}
+
+	if n.Right != nil {
+		return n.Right.Min()
+	}
+
+	current := n
+	for current.Parent != nil && current.Parent.Right == current {
+		current = current.Parent
+	}
+
+	return current.Parent
+}
+
+//Полное удаление дерева
+func (n *Node) Clear() {
+	*n = Node{}
 }
