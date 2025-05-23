@@ -101,6 +101,28 @@ func (q *Queue) IsInQueue(n Employee) bool {
 	return false
 }
 
+func (c *Collective) GetImportance(ID int) (Importance int) {
+	selected_worker := c.GetByID(ID)
+	queue := NewQueue()
+	seem := []Employee{}
+	queue.AddEmployee(selected_worker)
+	seem = append(seem, selected_worker)
+	for !queue.IsEmpty() {
+		worker := queue.GetEmployee()
+		for _, id := range worker.subordinates {
+			selected_worker := c.GetByID(id)
+			queue.AddEmployee(selected_worker)
+			if !IsHave(seem, selected_worker) {
+				seem = append(seem, selected_worker)
+			}
+		}
+	}
+	for i := range seem {
+		Importance += seem[i].importance
+	}
+	return
+}
+
 type Node struct {
 	val      string
 	neigbors []Node
@@ -108,9 +130,13 @@ type Node struct {
 
 func main() {
 	MyWorkers := NewCollective()
-	MyWorkers.AddEmployee(1, 15, []int{2, 3})
-	MyWorkers.AddEmployee(2, 10, []int{3})
-	MyWorkers.AddEmployee(3, 5, []int{})
+	MyWorkers.AddEmployee(1, 15, []int{2, 3, 6})
+	MyWorkers.AddEmployee(2, 10, []int{3, 4, 5})
+	MyWorkers.AddEmployee(3, 5, []int{4, 5})
+	MyWorkers.AddEmployee(4, 4, []int{5})
+	MyWorkers.AddEmployee(5, 3, []int{6})
+	MyWorkers.AddEmployee(6, 1, []int{})
 
-	MyWorkers.PrintEmployees()
+	fmt.Println(MyWorkers.GetImportance(2))
+	// 23, т.к. суммарно в подчинении у id2 : [3, 4, 5, 6]
 }
