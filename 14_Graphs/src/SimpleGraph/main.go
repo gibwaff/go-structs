@@ -2,9 +2,7 @@ package main
 
 import "fmt"
 
-type SimpleGraph struct {
-}
-
+//Задание 1
 type Employee struct {
 	id           int
 	importance   int
@@ -123,12 +121,83 @@ func (c *Collective) GetImportance(ID int) (Importance int) {
 	return
 }
 
+//Задание 2
 type Node struct {
 	val      string
 	neigbors []Node
 }
 
+func NewNode() Node {
+	return Node{}
+}
+
+func cloneGraph(node Node) Node {
+	res_graph := NewNode()
+	res_graph.val = node.val
+	res_graph.neigbors = node.neigbors
+	seem := []Node{}
+	queue := NewNQueue()
+	for _, el := range node.neigbors {
+		queue.AddNode(el)
+	}
+	for !queue.IsEmpty() {
+		cur_node := queue.GetNode()
+		if !IsInArr(seem, cur_node) {
+			seem = append(seem, cur_node)
+		}
+		for _, el := range cur_node.neigbors {
+			queue.AddNode(el)
+		}
+	}
+	return res_graph
+}
+
+type NQueue struct {
+	container []Node
+}
+
+func NewNQueue() NQueue {
+	return NQueue{}
+}
+
+func (nq *NQueue) AddNode(n Node) {
+	nq.container = append(nq.container, n)
+}
+
+func (nq *NQueue) GetNode() Node {
+	node := nq.container[len(nq.container)-1]
+	new_cont := []Node{}
+	for i := 1; i < len(nq.container); i++ {
+		new_cont = append(new_cont, nq.container[i])
+	}
+	nq.container = new_cont
+	return node
+}
+
+func (nq *NQueue) IsEmpty() bool {
+	return len(nq.container) == 0
+}
+
+func (nq *NQueue) IsInNQueue(node Node) bool {
+	for _, el := range nq.container {
+		if el.val == node.val {
+			return true
+		}
+	}
+	return false
+}
+
+func IsInArr(arr []Node, node Node) bool {
+	for _, el := range arr {
+		if node.val == el.val {
+			return true
+		}
+	}
+	return false
+}
+
 func main() {
+	//Задание 1
 	MyWorkers := NewCollective()
 	MyWorkers.AddEmployee(1, 15, []int{2, 3, 6})
 	MyWorkers.AddEmployee(2, 10, []int{3, 4, 5})
@@ -139,4 +208,10 @@ func main() {
 
 	fmt.Println(MyWorkers.GetImportance(2))
 	// 23, т.к. суммарно в подчинении у id2 : [3, 4, 5, 6]
+
+	//Задание 2
+	MyNodes2 := []Node{{val: "second"}, {val: "third"}}
+	MyNodes := []Node{{val: "sas", neigbors: MyNodes2}, {val: "sss", neigbors: MyNodes2}, {val: "key"}}
+	MyNode := cloneGraph(Node{val: "swag", neigbors: MyNodes})
+	fmt.Println(MyNode)
 }
