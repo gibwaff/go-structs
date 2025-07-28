@@ -48,6 +48,28 @@ func decompress(str string) string {
 
 //Задание 3
 
+func removeComments(source []string) []string {
+	var res []string
+	comm := false
+	for _, el := range source {
+		reworked_el := []byte(el)
+		if string(reworked_el[0]) == "/" && string(reworked_el[1]) == "/" {
+			continue
+		}
+		if string(reworked_el[0]) == "/" && string(reworked_el[1]) == "*" {
+			comm = true
+		}
+		if comm {
+			if string(reworked_el[len(reworked_el)-1]) == "/" && string(reworked_el[len(reworked_el)-2]) == "*" {
+				comm = false
+			}
+			continue
+		}
+		res = append(res, string(reworked_el))
+	}
+	return res
+}
+
 func main() {
 	//Задание 1
 	work1 := "aaaabbbc1"
@@ -60,5 +82,16 @@ func main() {
 	fmt.Println(decompress(compressed_work2)) //ssssswwwwwaaaagaa
 
 	//Задание 3
-
+	source := []string{
+		"//babbooo",
+		"/bbbbra",
+		"ooomb",
+		"/*brom*/",
+		"/*kawawawaw",
+		"wawawaww*/",
+	}
+	clear_source := removeComments(source)
+	fmt.Println(clear_source)
+	// [ /bbbbra,
+	//   ooomb,   ]
 }
