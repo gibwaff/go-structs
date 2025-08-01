@@ -72,6 +72,36 @@ func findSubarray3(arr []int, s int) bool {
 	return false
 }
 
+//Задание 2
+// Самый примитивный способ, подходящий только для матрицы 3х3 :)))
+func rotateMatrix1(arr [][]int) [][]int {
+	for i := 0; i < 2; i++ {
+		arr[0][0], arr[0][1], arr[0][2], arr[1][2], arr[2][2], arr[2][1], arr[2][0], arr[1][0] = arr[0][1], arr[0][2], arr[1][2], arr[2][2], arr[2][1], arr[2][0], arr[1][0], arr[0][0]
+	}
+
+	return arr
+}
+
+// Второй, итоговый способ:
+// поворот на 90гр = транспонирование + отражение по вертикали
+// Работает с квадратными матрицами любых размеров
+func rotateMatrix2(arr [][]int) [][]int {
+	//транспонируем
+	for i := 0; i < len(arr); i++ {
+		for j := i; j < len(arr); j++ {
+			arr[i][j], arr[j][i] = arr[j][i], arr[i][j]
+		}
+	}
+
+	//отражаем по серединной вертикали
+	for l, i := len(arr)-1, 0; l >= len(arr)/2; l-- {
+		arr[l], arr[i] = arr[i], arr[l]
+		i++
+	}
+
+	return arr
+}
+
 func main() {
 
 	//Задание 1
@@ -79,4 +109,10 @@ func main() {
 	S := 16
 	fmt.Println(findSubarray3(MyArray, S)) //true
 
+	//Задание 2
+	MyMatrix := [][]int{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}
+	MyMatrix = rotateMatrix2(MyMatrix)
+	for _, arr := range MyMatrix {
+		fmt.Println(arr)
+	}
 }
